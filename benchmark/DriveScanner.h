@@ -14,7 +14,7 @@
 #include <boost/asio/thread_pool.hpp>
 #pragma warning(pop)
 
-#include "../Tree/Tree.hpp"
+#include "tree.h"
 #include "FileInfo.hpp"
 #include "WinHack.hpp"
 
