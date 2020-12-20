@@ -9,6 +9,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <filesystem>
 
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -25,7 +26,7 @@ namespace
    /**
     * @brief Use the `FindFirstFileW(...)` function to retrieve the file size.
     *
-    * The `std::experimental::filesystem::file_size(...)` function uses a different native function
+    * The `std::filesystem::file_size(...)` function uses a different native function
     * to get at the file size for a given file, and this function (while probably faster than
     * `FindFirstFileW(...)`) has a tendency to throw. If such exceptional behaviour were to occur,
     * then this function can be used to hopefully still get at the file size.
@@ -34,7 +35,7 @@ namespace
     *
     * @returns The size of the file if it's accessible, and zero otherwise.
     */
-   std::uintmax_t GetFileSizeUsingWinAPI(const std::experimental::filesystem::path& path)
+   std::uintmax_t GetFileSizeUsingWinAPI(const std::filesystem::path& path)
    {
       std::uintmax_t fileSize{ 0 };
 
@@ -58,13 +59,13 @@ namespace
     *
     * @return The size of the file if it's accessible, and zero otherwise.
     */
-   std::uintmax_t ComputeFileSize(const std::experimental::filesystem::path& path) noexcept
+   std::uintmax_t ComputeFileSize(const std::filesystem::path& path) noexcept
    {
-      assert(!std::experimental::filesystem::is_directory(path));
+      assert(!std::filesystem::is_directory(path));
 
       try
       {
-         return std::experimental::filesystem::file_size(path);
+         return std::filesystem::file_size(path);
       }
       catch (...)
       {
@@ -80,7 +81,7 @@ namespace
     * @brief Removes nodes whose corresponding file or directory size is zero. This is often
     * necessary because a directory may contain only a single other directory within it that is
     * empty. In such a case, the outer directory has a size of zero, but
-    * std::experimental::filesystem::is_empty will still have reported this directory as being
+    * std::filesystem::is_empty will still have reported this directory as being
     * non-empty.
     *
     * @param[in, out] tree           The tree to be pruned.
@@ -137,9 +138,9 @@ namespace
     * @param[in] path                The path to the directory that should constitute the root node.
     */
    std::shared_ptr<Tree<FileInfo>>
-   CreateTreeAndRootNode(const std::experimental::filesystem::path& path)
+   CreateTreeAndRootNode(const std::filesystem::path& path)
    {
-      if (!std::experimental::filesystem::is_directory(path))
+      if (!std::filesystem::is_directory(path))
       {
          return nullptr;
       }
@@ -156,7 +157,7 @@ namespace
     * @returns A handle representing the repartse point found at the given path. If
     * the path is not a reparse point, then an invalid handle will be returned instead.
     */
-   ScopedHandle OpenReparsePoint(const std::experimental::filesystem::path& path)
+   ScopedHandle OpenReparsePoint(const std::filesystem::path& path)
    {
       const auto handle = CreateFile(
           /* fileName = */ path.wstring().c_str(),
@@ -202,7 +203,7 @@ namespace
    /**
     * @returns True if the given file path matches the given reparse tag, and false otherwise.
     */
-   bool IsReparseTag(const std::experimental::filesystem::path& path, DWORD targetTag)
+   bool IsReparseTag(const std::filesystem::path& path, DWORD targetTag)
    {
       static std::vector<std::byte> buffer{ MAXIMUM_REPARSE_DATA_BUFFER_SIZE };
 
@@ -218,7 +219,7 @@ namespace
     *
     * @note Junctions in Windows are considered mount points.
     */
-   bool IsMountPoint(const std::experimental::filesystem::path& path)
+   bool IsMountPoint(const std::filesystem::path& path)
    {
       const auto isMountPoint = IsReparseTag(path, IO_REPARSE_TAG_MOUNT_POINT);
 
@@ -234,7 +235,7 @@ namespace
    /**
     * @returns True if the given file path represents a symlink, and false otherwise.
     */
-   bool IsSymlink(const std::experimental::filesystem::path& path)
+   bool IsSymlink(const std::filesystem::path& path)
    {
       const auto isSymlink = IsReparseTag(path, IO_REPARSE_TAG_SYMLINK);
 
@@ -251,7 +252,7 @@ namespace
     * @returns True is the given file path matches any of the listed reparse tag, and false
     * otherwise.
     */
-   bool IsUnknownReparsePoint(const std::experimental::filesystem::path& path)
+   bool IsUnknownReparsePoint(const std::filesystem::path& path)
    {
       constexpr auto reparseTag =
           IO_REPARSE_TAG_MOUNT_POINT | IO_REPARSE_TAG_HSM | IO_REPARSE_TAG_DRIVE_EXTENDER |
@@ -275,7 +276,7 @@ namespace
    /**
     * @returns True if the given path represents a reparse point, and false otherwise.
     */
-   bool IsReparsePoint(const std::experimental::filesystem::path& path)
+   bool IsReparsePoint(const std::filesystem::path& path)
    {
       const ScopedHandle handle = OpenReparsePoint(path);
       if (!handle.IsValid())
@@ -295,13 +296,13 @@ namespace
    }
 }
 
-DriveScanner::DriveScanner(const std::experimental::filesystem::path& path)
+DriveScanner::DriveScanner(const std::filesystem::path& path)
     : m_fileTree{ CreateTreeAndRootNode(path) }, m_rootPath{ path }
 {
 }
 
 void DriveScanner::ProcessFile(
-    const std::experimental::filesystem::path& path, Tree<FileInfo>::Node& node) noexcept
+    const std::filesystem::path& path, Tree<FileInfo>::Node& node) noexcept
 {
    const auto fileSize = ComputeFileSize(path);
    if (fileSize == 0u)
@@ -319,14 +320,14 @@ void DriveScanner::ProcessFile(
 }
 
 void DriveScanner::ProcessDirectory(
-    const std::experimental::filesystem::path& path, Tree<FileInfo>::Node& node) noexcept
+    const std::filesystem::path& path, Tree<FileInfo>::Node& node) noexcept
 {
    bool isRegularFile = false;
    try
    {
       // In certain cases, this function can, apparently, raise exceptions, although it
       // isn't entirely clear to me what circumstances need to exist for this to occur:
-      isRegularFile = std::experimental::filesystem::is_regular_file(path);
+      isRegularFile = std::filesystem::is_regular_file(path);
    }
    catch (...)
    {
@@ -338,7 +339,7 @@ void DriveScanner::ProcessDirectory(
       ProcessFile(path, node);
    }
    else if (
-       std::experimental::filesystem::is_directory(path) &&
+       std::filesystem::is_directory(path) &&
        !IsReparsePoint(path))
    {
       try
@@ -347,7 +348,7 @@ void DriveScanner::ProcessDirectory(
          // directories, and attempts to do so will result in exceptional behaviour---pun intended.
          // In order to deal with these rare cases, we'll need to rely on a try-catch to keep going.
          // One example of a problematic directory in Windows 7 is: "C:\System Volume Information".
-         if (std::experimental::filesystem::is_empty(path))
+         if (std::filesystem::is_empty(path))
          {
             return;
          }
@@ -366,15 +367,15 @@ void DriveScanner::ProcessDirectory(
       auto* const lastChild = node.AppendChild(std::move(directoryInfo));
       lock.unlock();
 
-      auto itr = std::experimental::filesystem::directory_iterator{ path };
+      auto itr = std::filesystem::directory_iterator{ path };
       AddDirectoriesToQueue(itr, *lastChild);
    }
 }
 
 void DriveScanner::AddDirectoriesToQueue(
-    std::experimental::filesystem::directory_iterator& itr, Tree<FileInfo>::Node& node) noexcept
+    std::filesystem::directory_iterator& itr, Tree<FileInfo>::Node& node) noexcept
 {
-   const auto end = std::experimental::filesystem::directory_iterator{};
+   const auto end = std::filesystem::directory_iterator{};
    while (itr != end)
    {
       boost::asio::post(
@@ -394,7 +395,7 @@ void DriveScanner::Start()
    Stopwatch<std::chrono::seconds>(
        [&]() noexcept {
           boost::asio::post(m_threadPool, [&]() noexcept {
-             auto itr = std::experimental::filesystem::directory_iterator{ m_rootPath };
+             auto itr = std::filesystem::directory_iterator{ m_rootPath };
              AddDirectoriesToQueue(itr, *m_fileTree->GetRoot());
           });
 

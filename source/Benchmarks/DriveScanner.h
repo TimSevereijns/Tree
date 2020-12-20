@@ -1,6 +1,6 @@
 #pragma once
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include <atomic>
 #include <chrono>
@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <filesystem>
 
 #pragma warning(push )
 #pragma warning(disable: 4996)
@@ -24,7 +25,7 @@
 struct NodeAndPath
 {
    Tree<FileInfo>::Node& node;
-   std::experimental::filesystem::path path;
+   std::filesystem::path path;
 };
 
 /**
@@ -36,7 +37,7 @@ public:
 
    static constexpr std::uintmax_t SIZE_UNDEFINED{ 0 };
 
-   explicit DriveScanner(const std::experimental::filesystem::path& path);
+   explicit DriveScanner(const std::filesystem::path& path);
 
    /**
    * @brief Kicks off the drive scanning process.
@@ -59,7 +60,7 @@ private:
    * @param[in] fileNode            The Node in Tree to append newly discoved files to.
    */
    void ProcessFile(
-      const std::experimental::filesystem::path& path,
+      const std::filesystem::path& path,
       Tree<FileInfo>::Node& node) noexcept;
 
    /**
@@ -69,7 +70,7 @@ private:
    * @param[in] fileNode            The Node in Tree to append newly discoved files to.
    */
    void ProcessDirectory(
-      const std::experimental::filesystem::path& path,
+      const std::filesystem::path& path,
       Tree<FileInfo>::Node& node) noexcept;
 
    /**
@@ -79,12 +80,12 @@ private:
    * @param[in] Node                The Node to append the contents of the directory to.
    */
    void AddDirectoriesToQueue(
-      std::experimental::filesystem::directory_iterator& itr,
+      std::filesystem::directory_iterator& itr,
       Tree<FileInfo>::Node& node) noexcept;
 
    std::shared_ptr<Tree<FileInfo>> m_fileTree{ nullptr };
  
-   const std::experimental::filesystem::path m_rootPath;
+   const std::filesystem::path m_rootPath;
 
    std::mutex m_mutex;
 
