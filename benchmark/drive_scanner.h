@@ -15,8 +15,8 @@
 #pragma warning(pop)
 
 #include "tree.h"
-#include "FileInfo.hpp"
-#include "WinHack.hpp"
+#include "file_info.h"
+#include "win_hack.h"
 
 /**
 * @brief Wrapper around node and path.

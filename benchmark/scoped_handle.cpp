@@ -1,4 +1,4 @@
-#include "ScopedHandle.h"
+#include "scoped_handle.h"
 
 #include <Windows.h>
 

@@ -1,8 +1,7 @@
-#include "DriveScanner.h"
+#include "drive_scanner.h"
 
-#include "IgnoreUnused.hpp"
-#include "ScopedHandle.h"
-#include "Stopwatch.hpp"
+#include "scoped_handle.h"
+#include "stopwatch.h"
 
 #include <algorithm>
 #include <iostream>
@@ -70,7 +69,6 @@ namespace
       catch (...)
       {
          const std::lock_guard<std::mutex> lock{ streamMutex };
-         IgnoreUnused(lock);
 
          std::wcout << "Falling back on the Win API for: \"" << path.wstring() << "\"" << std::endl;
          return GetFileSizeUsingWinAPI(path);

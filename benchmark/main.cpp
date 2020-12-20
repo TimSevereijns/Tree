@@ -6,8 +6,8 @@
 
 #include "tree.h"
 
-#include "DriveScanner.h"
-#include "Stopwatch.hpp"
+#include "drive_scanner.h"
+#include "stopwatch.h"
 
 #define BOOST_ASIO_DISABLE_CONCEPTS
 

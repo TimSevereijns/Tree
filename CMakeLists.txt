@@ -34,16 +34,15 @@ set (TESTS
     tests/unit_tests.cpp)
 
 set(BENCHMARK
-    benchmark/Benchmarks.cpp
-    benchmark/DriveScanner.cpp
-    benchmark/DriveScanner.h
-    benchmark/FileInfo.hpp
-    benchmark/IgnoreUnused.hpp
-    benchmark/ScopedHandle.cpp
-    benchmark/ScopedHandle.h
-    benchmark/Stopwatch.hpp
-    benchmark/ThreadSafeQueue.hpp
-    benchmark/WinHack.hpp)
+    benchmark/main.cpp
+    benchmark/drive_scanner.cpp
+    benchmark/drive_scanner.h
+    benchmark/file_info.h
+    benchmark/scoped_handle.cpp
+    benchmark/scoped_handle.h
+    benchmark/stopwatch.h
+    benchmark/thread_safe_queue.h
+    benchmark/win_hack.h)
 
 include_directories(${SOURCE_DIR} ${THIRD_PARTY})
 
