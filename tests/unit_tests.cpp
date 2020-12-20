@@ -206,7 +206,6 @@ TEST_CASE("Node Alterations")
    SECTION("Altering Data")
    {
       auto& data = node.GetData();
-#pragma warning(suppress: 4244) // toupper(...) takes an int instead of a char.
       std::transform(std::begin(data), std::end(data), std::begin(data), ::toupper);
 
       REQUIRE(node.GetData() == "BAR");
