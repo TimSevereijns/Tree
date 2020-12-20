@@ -28,7 +28,8 @@ set(SOURCE_DIR
     source)
 
 set(THIRD_PARTY
-    third-party/catch2/single_include)
+    third-party/catch2/single_include
+    third-party/stopwatch/source)
 
 set (TESTS
     tests/unit_tests.cpp)
@@ -40,7 +41,6 @@ set(BENCHMARK
     benchmark/file_info.h
     benchmark/scoped_handle.cpp
     benchmark/scoped_handle.h
-    benchmark/stopwatch.h
     benchmark/thread_safe_queue.h
     benchmark/win_hack.h)
 
