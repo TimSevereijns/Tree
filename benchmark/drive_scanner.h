@@ -50,7 +50,7 @@ public:
    std::shared_ptr<Tree<FileInfo>> GetTree();
 
    /**
-    * 
+    * @returns A constant reference to the progress tracker.
     */ 
    const ScanningProgress& DriveScanner::GetProgress() const;
 
