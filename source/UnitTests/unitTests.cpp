@@ -87,16 +87,16 @@ namespace
     *
     * @param[in] expected                  The expected sequence.
     * @param[in] actual                    The actual sequence.
-    * @param[in] performSubsetComparision  Forces the consumer to explicitly acknowledge that he
+    * @param[in] performSubsetComparison   Forces the consumer to explicitly acknowledge that he
     *                                      or she wants to allow subset comparison.
     */
    template <typename DataType>
    void VerifyTraversal(
        const std::vector<DataType>& expected,
        const std::vector<DataType>& actual,
-       bool performSubsetComparision = false)
+       bool performSubsetComparison = false)
    {
-      if (performSubsetComparision)
+      if (performSubsetComparison)
       {
          SubsetEquals(expected, actual);
          return;
@@ -120,8 +120,8 @@ namespace
    void VerifyParentIsIdentical(const Tree<DataType>& tree)
    {
       const bool allNodesHaveIdenticalParent = std::all_of(
-          Tree<DataType>::LeafIterator{ tree.GetRoot() },
-          Tree<DataType>::LeafIterator{},
+          typename Tree<DataType>::LeafIterator{ tree.GetRoot() },
+          typename Tree<DataType>::LeafIterator{},
           [root = tree.GetRoot()](const auto& node) noexcept { return node.GetParent() == root; });
 
       REQUIRE(allNodesHaveIdenticalParent == true);
@@ -208,6 +208,7 @@ TEST_CASE("Node Alterations")
    SECTION("Altering Data")
    {
       auto& data = node.GetData();
+#pragma warning(suppress: 4244) // toupper(...) takes an int instead of a char.
       std::transform(std::begin(data), std::end(data), std::begin(data), ::toupper);
 
       REQUIRE(node.GetData() == "BAR");

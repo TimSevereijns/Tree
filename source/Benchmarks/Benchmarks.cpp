@@ -9,6 +9,8 @@
 #include "DriveScanner.h"
 #include "Stopwatch.hpp"
 
+#define BOOST_ASIO_DISABLE_CONCEPTS
+
 namespace
 {
 #if _DEBUG
@@ -36,50 +38,6 @@ namespace
          [] (auto total, auto current) noexcept { return total + current.count(); });
 
       return sum / elapsedTimes.size();
-   }
-
-   template<
-      typename TraversalType,
-      typename DataType
-   >
-   void IsMemoryLayoutSequential(const Tree<DataType>& tree)
-   {
-      std::vector<std::size_t> visitedIndices;
-      visitedIndices.reserve(tree.Size());
-
-      using IteratorType = TraversalType::Iterator<DataType>;
-
-      std::transform(IteratorType{ tree.GetRoot() }, IteratorType{ },
-         std::back_inserter(visitedIndices), [] (const auto& node) noexcept { return node.GetIndex(); });
-
-      std::vector<std::size_t> expectedIndices;
-      expectedIndices.resize(visitedIndices.size());
-
-      std::iota(std::begin(expectedIndices), std::end(expectedIndices), 0u);
-
-      const auto isSequential = std::equal(
-         std::begin(expectedIndices), std::end(expectedIndices),
-         std::begin(visitedIndices), std::end(visitedIndices));
-
-      std::cout << "Is Layout Sequential: " << std::boolalpha << isSequential << std::endl;
-   }
-
-   template<
-      typename ChronoType,
-      typename DataType
-   >
-   void OptimizeMemoryLayout(Tree<DataType>& tree)
-   {
-      using TraversalType = PostOrderTraversal;
-
-      IsMemoryLayoutSequential<TraversalType>(tree);
-
-      Stopwatch<ChronoType>([&] () noexcept
-      {
-         tree.OptimizeMemoryLayoutFor<TraversalType>();
-      }, "Optimized Layout in ");
-
-      IsMemoryLayoutSequential<TraversalType>(tree);
    }
 }
 
