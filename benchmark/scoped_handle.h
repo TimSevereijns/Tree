@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef WIN32
+
 using HANDLE = void*;
 
 class ScopedHandle
@@ -26,3 +28,5 @@ private:
 
    HANDLE m_handle;
 };
+
+#endif // Win32

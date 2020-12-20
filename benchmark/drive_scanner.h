@@ -68,18 +68,18 @@ private:
    * @param[in] path                The location on disk to scan.
    * @param[in] fileNode            The Node in Tree to append newly discoved files to.
    */
-   void ProcessDirectory(
+   void ProcessPath(
       const std::filesystem::path& path,
       Tree<FileInfo>::Node& node) noexcept;
 
    /**
    * @brief Adds directories to thread-pool queue.
    *
-   * @param[in] itr                 Reference to the directory to iterate over.
+   * @param[in] path                Path to the directory to iterate over.
    * @param[in] Node                The Node to append the contents of the directory to.
    */
-   void AddDirectoriesToQueue(
-      std::filesystem::directory_iterator& itr,
+   void AddSubDirectoriesToQueue(
+      const std::filesystem::path& path,
       Tree<FileInfo>::Node& node) noexcept;
 
    std::shared_ptr<Tree<FileInfo>> m_fileTree{ nullptr };

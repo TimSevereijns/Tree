@@ -1,5 +1,7 @@
 #include "scoped_handle.h"
 
+#ifdef WIN32
+
 #include <Windows.h>
 
 namespace
@@ -93,3 +95,5 @@ ScopedHandle::operator HANDLE() const
 {
    return m_handle;
 }
+
+#endif // Win32
