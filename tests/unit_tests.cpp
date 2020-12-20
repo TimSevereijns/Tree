@@ -206,7 +206,15 @@ TEST_CASE("Node Alterations")
    SECTION("Altering Data")
    {
       auto& data = node.GetData();
+
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable : 4244) // toupper(...) takes an int instead of a char.
+#endif
       std::transform(std::begin(data), std::end(data), std::begin(data), ::toupper);
+#ifdef WIN32
+#pragma warning(pop)
+#endif // Win32
 
       REQUIRE(node.GetData() == "BAR");
    }
