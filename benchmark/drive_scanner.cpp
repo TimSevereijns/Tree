@@ -4,7 +4,6 @@
 #include "stopwatch.h"
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -26,8 +25,6 @@
 
 namespace
 {
-   std::mutex streamMutex;
-
 #ifdef WIN32
    /**
     * @brief Use the `FindFirstFileW(...)` function to retrieve the file size.
@@ -82,37 +79,6 @@ namespace
         return 0ull;
 #endif
       }
-   }
-
-   /**
-    * @brief Removes nodes whose corresponding file or directory size is zero. This is often
-    * necessary because a directory may contain only a single other directory within it that is
-    * empty. In such a case, the outer directory has a size of zero, but
-    * std::filesystem::is_empty will still have reported this directory as being
-    * non-empty.
-    *
-    * @param[in, out] tree           The tree to be pruned.
-    */
-   void PruneEmptyFilesAndDirectories(Tree<FileInfo>& tree)
-   {
-      std::vector<Tree<FileInfo>::Node*> toBeDeleted;
-
-      for (auto&& node : tree)
-      {
-         if (node->size == 0)
-         {
-            toBeDeleted.emplace_back(&node);
-         }
-      }
-
-      const auto nodesRemoved = toBeDeleted.size();
-
-      for (auto* node : toBeDeleted)
-      {
-         node->DeleteFromTree();
-      }
-
-      std::cout << "Number of Sizeless Files Removed: " << nodesRemoved << std::endl;
    }
 
    /**
@@ -246,11 +212,15 @@ DriveScanner::DriveScanner(const std::filesystem::path& path)
 void DriveScanner::ProcessFile(
     const std::filesystem::path& path, Tree<FileInfo>::Node& node) noexcept
 {
+   m_progress.filesScanned.fetch_add(1);
+
    const auto fileSize = ComputeFileSize(path);
    if (fileSize == 0u)
    {
       return;
    }
+
+   m_progress.bytesProcessed.fetch_add(fileSize);
 
    FileInfo fileInfo{ path.filename().stem().wstring(),
                       path.filename().extension().wstring(),
@@ -307,6 +277,8 @@ void DriveScanner::ProcessPath(
       auto* const lastChild = node.AppendChild(std::move(directoryInfo));
       lock.unlock();
 
+      m_progress.directoriesScanned.fetch_add(1);
+
       AddSubDirectoriesToQueue(path, *lastChild);
    }
 }
@@ -331,20 +303,21 @@ std::shared_ptr<Tree<FileInfo>> DriveScanner::GetTree()
    return m_fileTree;
 }
 
+const ScanningProgress& DriveScanner::GetProgress() const
+{
+    return m_progress;
+}
+
 void DriveScanner::Start()
 {
-    const auto stopwatch = Stopwatch<std::chrono::seconds>(
-       [&]() noexcept {
-          boost::asio::post(m_threadPool, [&]() noexcept {
-             AddSubDirectoriesToQueue(m_rootPath, *m_fileTree->GetRoot());
-          });
+    m_progress.Reset();
 
-          m_threadPool.join();
-       });
+    boost::asio::post(m_threadPool, [&]() noexcept {
+        AddSubDirectoriesToQueue(m_rootPath, *m_fileTree->GetRoot());
+    });
 
-    std::cout << "\nScanned Drive in " << stopwatch.GetElapsedTime().count()
-              << " " << stopwatch.GetUnitsAsCharacterArray() << ".\n";
+    m_threadPool.join();
 
-   ComputeDirectorySizes(*m_fileTree);
-   PruneEmptyFilesAndDirectories(*m_fileTree);
+    ComputeDirectorySizes(*m_fileTree);
+    m_progress.scanCompleted.store(true);
 }

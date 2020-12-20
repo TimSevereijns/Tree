@@ -17,6 +17,7 @@
 #include "tree.h"
 #include "file_info.h"
 #include "win_hack.h"
+#include "scanning_progress.h"
 
 /**
 * @brief Wrapper around node and path.
@@ -47,6 +48,11 @@ public:
    * @returns The file tree.
    */
    std::shared_ptr<Tree<FileInfo>> GetTree();
+
+   /**
+    * 
+    */ 
+   const ScanningProgress& DriveScanner::GetProgress() const;
 
 private:
 
@@ -81,6 +87,8 @@ private:
    void AddSubDirectoriesToQueue(
       const std::filesystem::path& path,
       Tree<FileInfo>::Node& node) noexcept;
+
+   ScanningProgress m_progress;
 
    std::shared_ptr<Tree<FileInfo>> m_fileTree{ nullptr };
  
