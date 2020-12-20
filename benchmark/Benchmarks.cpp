@@ -4,7 +4,7 @@
 #include <string>
 #include <filesystem>
 
-#include "../Tree/Tree.hpp"
+#include "tree.h"
 
 #include "DriveScanner.h"
 #include "Stopwatch.hpp"

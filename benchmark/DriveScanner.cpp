@@ -39,15 +39,15 @@ namespace
    {
       std::uintmax_t fileSize{ 0 };
 
-      WIN32_FIND_DATA fileData;
-      const HANDLE fileHandle = FindFirstFileW(path.wstring().data(), &fileData);
+      LPWIN32_FIND_DATAW fileData = nullptr;
+      const HANDLE fileHandle = FindFirstFileW(path.wstring().data(), fileData);
       if (fileHandle == INVALID_HANDLE_VALUE)
       {
          return 0;
       }
 
-      const auto highWord = static_cast<std::uintmax_t>(fileData.nFileSizeHigh);
-      fileSize = (highWord << sizeof(fileData.nFileSizeLow) * 8) | fileData.nFileSizeLow;
+      const auto highWord = static_cast<std::uintmax_t>(fileData->nFileSizeHigh);
+      fileSize = (highWord << sizeof(fileData->nFileSizeLow) * 8) | fileData->nFileSizeLow;
 
       return fileSize;
    }
@@ -159,7 +159,7 @@ namespace
     */
    ScopedHandle OpenReparsePoint(const std::filesystem::path& path)
    {
-      const auto handle = CreateFile(
+      const auto handle = CreateFileW(
           /* fileName = */ path.wstring().c_str(),
           /* desiredAccess = */ GENERIC_READ,
           /* shareMode = */ 0,

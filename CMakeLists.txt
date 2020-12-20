@@ -21,7 +21,6 @@ if (WIN32)
 endif (WIN32)
 
 set(SOURCES
-    tests/unit_tests.cpp
     source/tree.h
     source/tree_utils.h)
 
@@ -31,18 +30,32 @@ set(SOURCE_DIR
 set(THIRD_PARTY
     third-party/catch2/single_include)
 
+set (TESTS
+    tests/unit_tests.cpp)
+
 set(BENCHMARK
-    benchmark)
+    benchmark/Benchmarks.cpp
+    benchmark/DriveScanner.cpp
+    benchmark/DriveScanner.h
+    benchmark/FileInfo.hpp
+    benchmark/IgnoreUnused.hpp
+    benchmark/ScopedHandle.cpp
+    benchmark/ScopedHandle.h
+    benchmark/Stopwatch.hpp
+    benchmark/ThreadSafeQueue.hpp
+    benchmark/WinHack.hpp)
 
 include_directories(${SOURCE_DIR} ${THIRD_PARTY})
 
-add_executable(tests ${SOURCES})
+add_executable(tests ${SOURCES} ${TESTS})
+set_target_properties(tests PROPERTIES LINKER_LANGUAGE CXX)
 
 if (UNIX)
     target_link_libraries(tests stdc++ ${CONAN_LIBS})
 endif (UNIX)
 
 add_executable(benchmark ${SOURCES} ${BENCHMARK})
+set_target_properties(benchmark PROPERTIES LINKER_LANGUAGE CXX)
 
 if (UNIX)
     target_link_libraries(benchmark stdc++ ${CONAN_LIBS})

@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 
-#include "Tree.hpp"
+#include "tree.h"
 
 namespace
 {
