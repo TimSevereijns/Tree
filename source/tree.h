@@ -620,7 +620,6 @@ class Tree<DataType>::Node
    }
 
  private:
-
    /**
     * @brief Splits the linked-list of sibling nodes in two.
     *
@@ -664,7 +663,7 @@ class Tree<DataType>::Node
 
       head = MergeSort(head, comparator);
       second = MergeSort(second, comparator);
- 
+
       return MergeSortedHalves(head, second, comparator);
    }
 

@@ -12,43 +12,43 @@
 
 struct REPARSE_DATA_BUFFER_T
 {
-    ULONG ReparseTag;
+   ULONG ReparseTag;
 
-    USHORT ReparseDataLength;
-    USHORT Reserved;
+   USHORT ReparseDataLength;
+   USHORT Reserved;
 
-    union DummyUnion_t
-    {
-        struct SymbolicLinkReparseBuffer_t
-        {
-            USHORT SubstituteNameOffset;
-            USHORT SubstituteNameLength;
-            USHORT PrintNameOffset;
-            USHORT PrintNameLength;
-            ULONG Flags;
-            WCHAR PathBuffer[1];
-        } SymbolicLinkReparseBuffer;
+   union DummyUnion_t
+   {
+      struct SymbolicLinkReparseBuffer_t
+      {
+         USHORT SubstituteNameOffset;
+         USHORT SubstituteNameLength;
+         USHORT PrintNameOffset;
+         USHORT PrintNameLength;
+         ULONG Flags;
+         WCHAR PathBuffer[1];
+      } SymbolicLinkReparseBuffer;
 
-        struct MountPointReparseBuffer_t
-        {
-            USHORT SubstituteNameOffset;
-            USHORT SubstituteNameLength;
-            USHORT PrintNameOffset;
-            USHORT PrintNameLength;
-            WCHAR PathBuffer[1];
-        } MountPointReparseBuffer;
+      struct MountPointReparseBuffer_t
+      {
+         USHORT SubstituteNameOffset;
+         USHORT SubstituteNameLength;
+         USHORT PrintNameOffset;
+         USHORT PrintNameLength;
+         WCHAR PathBuffer[1];
+      } MountPointReparseBuffer;
 
-        struct GenericReparseBuffer_t
-        {
-            UCHAR DataBuffer[1];
-        } GenericReparseBuffer;
-    } DUMMYUNIONNAME;
+      struct GenericReparseBuffer_t
+      {
+         UCHAR DataBuffer[1];
+      } GenericReparseBuffer;
+   } DUMMYUNIONNAME;
 };
 
 using REPARSE_DATA_BUFFER = REPARSE_DATA_BUFFER_T;
 
 #define REPARSE_DATA_BUFFER_HEADER_LENGTH                                                          \
-    FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer.DataBuffer)
+   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer.DataBuffer)
 
 // @see https://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx
 

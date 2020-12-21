@@ -6,7 +6,7 @@ using HANDLE = void*;
 
 class ScopedHandle
 {
-public:
+ public:
    explicit ScopedHandle(HANDLE handle);
    ~ScopedHandle();
 
@@ -24,8 +24,7 @@ public:
 
    operator HANDLE() const;
 
-private:
-
+ private:
    HANDLE m_handle;
 };
 

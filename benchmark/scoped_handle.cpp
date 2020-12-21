@@ -16,20 +16,19 @@ namespace
       HANDLE duplicate;
 
       const auto successfullyDuplicated = !DuplicateHandle(
-         /* sourceProcessHandle = */ GetCurrentProcess(),
-         /* sourceHandle = */ handle,
-         /* targetProcessHandle = */ GetCurrentProcess(),
-         /* targetHandle = */ &duplicate,
-         /* desiredAccess = */ 0,
-         /* inheritHandle = */ FALSE,
-         /* options = */ DUPLICATE_SAME_ACCESS);
+          /* sourceProcessHandle = */ GetCurrentProcess(),
+          /* sourceHandle = */ handle,
+          /* targetProcessHandle = */ GetCurrentProcess(),
+          /* targetHandle = */ &duplicate,
+          /* desiredAccess = */ 0,
+          /* inheritHandle = */ FALSE,
+          /* options = */ DUPLICATE_SAME_ACCESS);
 
       return successfullyDuplicated ? duplicate : nullptr;
    }
-}
+} // namespace
 
-ScopedHandle::ScopedHandle(HANDLE handle) :
-   m_handle{ handle }
+ScopedHandle::ScopedHandle(HANDLE handle) : m_handle{ handle }
 {
 }
 

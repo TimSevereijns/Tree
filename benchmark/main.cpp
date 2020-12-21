@@ -33,10 +33,9 @@ namespace
       }
 
       const auto sum = std::accumulate(
-          std::begin(elapsedTimes),
-          std::end(elapsedTimes),
-          0ull,
-          [](auto total, auto current) { return total + current.count(); });
+          std::begin(elapsedTimes), std::end(elapsedTimes), 0ull, [](auto total, auto current) {
+             return total + current.count();
+          });
 
       return sum / elapsedTimes.size();
    }

@@ -3,16 +3,15 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <type_traits>
 #include <queue>
+#include <type_traits>
 
-template<typename Type>
+template <typename Type>
 class ThreadSafeQueue
 {
    static_assert(std::is_move_constructible<Type>::value, "Type has to be move-constructible.");
 
-public:
-
+ public:
    void Push(Type data)
    {
       const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
@@ -22,7 +21,7 @@ public:
       m_conditionVariable.notify_one();
    }
 
-   template<typename... Args>
+   template <typename... Args>
    void Emplace(Args&&... args)
    {
       const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
@@ -74,7 +73,7 @@ public:
 
       if (m_queue.empty())
       {
-         return { };
+         return {};
       }
 
       const auto result = std::make_shared<Type>(std::move(m_queue.front()));
@@ -89,8 +88,7 @@ public:
       return m_queue.empty();
    }
 
-private:
-
+ private:
    mutable std::mutex m_mutex;
 
    std::queue<Type> m_queue;

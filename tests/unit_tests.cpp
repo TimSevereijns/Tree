@@ -224,8 +224,7 @@ TEST_CASE("Prepending and Appending Nodes")
 {
    Tree<int> tree{ 10 };
 
-   const auto IsEachNodeValueLargerThanTheLast = [&]() noexcept
-   {
+   const auto IsEachNodeValueLargerThanTheLast = [&]() noexcept {
       int lastValue = -1;
 
       return std::all_of(std::begin(tree), std::end(tree), [&](Tree<int>::const_reference node) {
@@ -623,9 +622,8 @@ TEST_CASE("Sorting")
           tree.GetRoot()->GetFirstChild()->GetNextSibling()->GetPreviousSibling() ==
           tree.GetRoot()->GetFirstChild());
 
-      tree.GetRoot()->SortChildren([](const auto& lhs, const auto& rhs) noexcept {
-         return (lhs < rhs);
-      });
+      tree.GetRoot()->SortChildren(
+          [](const auto& lhs, const auto& rhs) noexcept { return (lhs < rhs); });
 
       REQUIRE(
           tree.GetRoot()->GetFirstChild()->GetNextSibling()->GetPreviousSibling() ==
@@ -662,9 +660,8 @@ TEST_CASE("Sorting")
       tree.GetRoot()->AppendChild("L");
       tree.GetRoot()->AppendChild("K");
 
-      tree.GetRoot()->SortChildren([](const auto& lhs, const auto& rhs) noexcept {
-         return (lhs < rhs);
-      });
+      tree.GetRoot()->SortChildren(
+          [](const auto& lhs, const auto& rhs) noexcept { return (lhs < rhs); });
 
       REQUIRE(tree.GetRoot()->GetFirstChild()->GetPreviousSibling() == nullptr);
       REQUIRE(tree.GetRoot()->GetLastChild()->GetNextSibling() == nullptr);

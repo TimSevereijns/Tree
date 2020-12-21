@@ -4,10 +4,10 @@
 #include "stopwatch.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <filesystem>
 
 #ifdef WIN32
 #pragma warning(push)
@@ -76,7 +76,7 @@ namespace
 #ifdef WIN32
          return GetFileSizeUsingWinAPI(path);
 #elif // Win32
-        return 0ull;
+         return 0ull;
 #endif
       }
    }
@@ -110,8 +110,7 @@ namespace
     *
     * @param[in] path                The path to the directory that should constitute the root node.
     */
-   std::shared_ptr<Tree<FileInfo>>
-   CreateTreeAndRootNode(const std::filesystem::path& path)
+   std::shared_ptr<Tree<FileInfo>> CreateTreeAndRootNode(const std::filesystem::path& path)
    {
       if (!std::filesystem::is_directory(path))
       {
@@ -128,81 +127,83 @@ namespace
 
 #ifdef WIN32
    ScopedHandle OpenReparsePoint(const std::filesystem::path& path) noexcept
-    {
-        const auto handle = CreateFileW(
-            /* lpFileName = */ path.wstring().c_str(),
-            /* dwDesiredAccess = */ GENERIC_READ,
-            /* dwShareMode = */ 0,
-            /* lpSecurityAttributes = */ nullptr,
-            /* dwCreationDisposition = */ OPEN_EXISTING,
-            /* dwFlagsAndAttributes = */ FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-            /* hTemplateFile = */ nullptr);
+   {
+      const auto handle = CreateFileW(
+          /* lpFileName = */ path.wstring().c_str(),
+          /* dwDesiredAccess = */ GENERIC_READ,
+          /* dwShareMode = */ 0,
+          /* lpSecurityAttributes = */ nullptr,
+          /* dwCreationDisposition = */ OPEN_EXISTING,
+          /* dwFlagsAndAttributes = */ FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
+          /* hTemplateFile = */ nullptr);
 
-        return ScopedHandle{ handle };
-    }
+      return ScopedHandle{ handle };
+   }
 
-    bool ReadReparsePoint(const std::wstring& path, std::vector<std::byte>& reparseBuffer) noexcept
-    {
-        const auto handle = OpenReparsePoint(path);
-        if (!handle.IsValid()) {
-            return false;
-        }
+   bool ReadReparsePoint(const std::wstring& path, std::vector<std::byte>& reparseBuffer) noexcept
+   {
+      const auto handle = OpenReparsePoint(path);
+      if (!handle.IsValid())
+      {
+         return false;
+      }
 
-        DWORD bytesReturned{ 0 };
+      DWORD bytesReturned{ 0 };
 
-        const auto successfullyRetrieved =
-            DeviceIoControl(
-                /* hDevice = */ static_cast<HANDLE>(handle),
-                /* dwIoControlCode = */ FSCTL_GET_REPARSE_POINT,
-                /* lpInBuffer = */ nullptr,
-                /* nInBufferSize = */ 0,
-                /* lpOutBuffer = */ static_cast<LPVOID>(reparseBuffer.data()),
-                /* nOutBufferSize = */ static_cast<DWORD>(reparseBuffer.size()),
-                /* lpBytesReturned = */ &bytesReturned,
-                /* lpOverlapped = */ nullptr) == TRUE;
+      const auto successfullyRetrieved =
+          DeviceIoControl(
+              /* hDevice = */ static_cast<HANDLE>(handle),
+              /* dwIoControlCode = */ FSCTL_GET_REPARSE_POINT,
+              /* lpInBuffer = */ nullptr,
+              /* nInBufferSize = */ 0,
+              /* lpOutBuffer = */ static_cast<LPVOID>(reparseBuffer.data()),
+              /* nOutBufferSize = */ static_cast<DWORD>(reparseBuffer.size()),
+              /* lpBytesReturned = */ &bytesReturned,
+              /* lpOverlapped = */ nullptr) == TRUE;
 
-        return successfullyRetrieved && bytesReturned;
-    }
+      return successfullyRetrieved && bytesReturned;
+   }
 
-    bool IsReparseTag(const std::filesystem::path& path, DWORD targetTag) noexcept
-    {
-        static std::vector<std::byte> buffer{ MAXIMUM_REPARSE_DATA_BUFFER_SIZE };
+   bool IsReparseTag(const std::filesystem::path& path, DWORD targetTag) noexcept
+   {
+      static std::vector<std::byte> buffer{ MAXIMUM_REPARSE_DATA_BUFFER_SIZE };
 
-        const auto successfullyRead = ReadReparsePoint(path, buffer);
-        return successfullyRead
-                   ? reinterpret_cast<REPARSE_DATA_BUFFER*>(buffer.data())->ReparseTag == targetTag
-                   : false;
-    }
+      const auto successfullyRead = ReadReparsePoint(path, buffer);
+      return successfullyRead
+                 ? reinterpret_cast<REPARSE_DATA_BUFFER*>(buffer.data())->ReparseTag == targetTag
+                 : false;
+   }
 
-    bool IsReparsePoint(const std::filesystem::path& path) noexcept
-    {
-        WIN32_FIND_DATAW findData;
-        HANDLE handle = FindFirstFileW(path.native().c_str(), &findData);
-        if (handle == INVALID_HANDLE_VALUE) {
-            return false;
-        }
+   bool IsReparsePoint(const std::filesystem::path& path) noexcept
+   {
+      WIN32_FIND_DATAW findData;
+      HANDLE handle = FindFirstFileW(path.native().c_str(), &findData);
+      if (handle == INVALID_HANDLE_VALUE)
+      {
+         return false;
+      }
 
-        const auto attributes = findData.dwFileAttributes;
-        if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) &&
-            (attributes & FILE_ATTRIBUTE_DIRECTORY)) {
-            FindClose(handle);
-            return true;
-        }
+      const auto attributes = findData.dwFileAttributes;
+      if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) && (attributes & FILE_ATTRIBUTE_DIRECTORY))
+      {
+         FindClose(handle);
+         return true;
+      }
 
-        FindClose(handle);
-        return false;
-    }
+      FindClose(handle);
+      return false;
+   }
 #endif // Win32
 
    bool IsScannable(const std::filesystem::path& path) noexcept
    {
 #ifdef WIN32
-    return !IsReparsePoint(path);
+      return !IsReparsePoint(path);
 #elif defined(__linux__)
-    return !std::filesystem::is_symlink(path);
+      return !std::filesystem::is_symlink(path);
 #endif // Linux
    }
-}
+} // namespace
 
 DriveScanner::DriveScanner(const std::filesystem::path& path)
     : m_fileTree{ CreateTreeAndRootNode(path) }, m_rootPath{ path }
@@ -292,7 +293,7 @@ void DriveScanner::AddSubDirectoriesToQueue(
    while (itr != end)
    {
       boost::asio::post(
-          m_threadPool, [&, path = itr->path() ]() noexcept { ProcessPath(path, node); });
+          m_threadPool, [&, path = itr->path()]() noexcept { ProcessPath(path, node); });
 
       ++itr;
    }
@@ -305,19 +306,19 @@ std::shared_ptr<Tree<FileInfo>> DriveScanner::GetTree()
 
 const ScanningProgress& DriveScanner::GetProgress() const
 {
-    return m_progress;
+   return m_progress;
 }
 
 void DriveScanner::Start()
 {
-    m_progress.Reset();
+   m_progress.Reset();
 
-    boost::asio::post(m_threadPool, [&]() noexcept {
-        AddSubDirectoriesToQueue(m_rootPath, *m_fileTree->GetRoot());
-    });
+   boost::asio::post(m_threadPool, [&]() noexcept {
+      AddSubDirectoriesToQueue(m_rootPath, *m_fileTree->GetRoot());
+   });
 
-    m_threadPool.join();
+   m_threadPool.join();
 
-    ComputeDirectorySizes(*m_fileTree);
-    m_progress.scanCompleted.store(true);
+   ComputeDirectorySizes(*m_fileTree);
+   m_progress.scanCompleted.store(true);
 }
