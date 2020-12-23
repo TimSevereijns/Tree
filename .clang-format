@@ -1,39 +1,31 @@
 ﻿---
-BasedOnStyle: LLVM
 AlignAfterOpenBracket: AlwaysBreak
-AlignConsecutiveAssignments: 'false'
-AlignConsecutiveDeclarations: 'false'
-AlignTrailingComments: 'true'
-AllowAllParametersOfDeclarationOnNextLine: 'true'
-AllowShortBlocksOnASingleLine: 'false'
-AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: 'false'
-AllowShortLoopsOnASingleLine: 'false'
-AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakBeforeMultilineStrings: 'true'
-AlwaysBreakTemplateDeclarations: 'true'
-BinPackArguments: 'false'
-BinPackParameters: 'false'
-BreakBeforeBraces: Allman
-BreakBeforeTernaryOperators: 'true'
-BreakConstructorInitializersBeforeComma: 'false'
-BreakStringLiterals: 'true'
-ColumnLimit: '100'
-ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
-Cpp11BracedListStyle: 'false'
-IndentCaseLabels: 'true'
-Language: Cpp
-NamespaceIndentation: All
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakBeforeMultilineStrings: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterClass: true
+    AfterEnum: true
+    AfterStruct: true
+    AfterFunction: true
+    AfterControlStatement: false
+    AfterNamespace: true
+    AfterUnion: true
+    AfterExternBlock: true
+    BeforeElse: false
+    SplitEmptyFunction: true
+    SplitEmptyRecord: true
+    SplitEmptyNamespace: true
+ColumnLimit: 100
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+Cpp11BracedListStyle: false
+IndentCaseLabels: true
+IndentWidth: 4
+NamespaceIndentation: None
 PointerAlignment: Left
-ReflowComments: 'true'
-SortIncludes: 'true'
-SpacesInAngles: 'false'
-SpacesInCStyleCastParentheses: 'false'
-SpacesInParentheses: 'false'
-SpacesInSquareBrackets: 'false'
-TabWidth: '3'
-IndentWidth: '3'
-UseTab: Never
-
+BreakBeforeTernaryOperators: true
 ...

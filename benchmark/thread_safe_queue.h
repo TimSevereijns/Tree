@@ -6,91 +6,87 @@
 #include <queue>
 #include <type_traits>
 
-template <typename Type>
-class ThreadSafeQueue
+template <typename Type> class ThreadSafeQueue
 {
-   static_assert(std::is_move_constructible<Type>::value, "Type has to be move-constructible.");
+    static_assert(std::is_move_constructible<Type>::value, "Type has to be move-constructible.");
 
- public:
-   void Push(Type data)
-   {
-      const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
+  public:
+    void Push(Type data)
+    {
+        const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
 
-      m_queue.push(std::move(data));
+        m_queue.push(std::move(data));
 
-      m_conditionVariable.notify_one();
-   }
+        m_conditionVariable.notify_one();
+    }
 
-   template <typename... Args>
-   void Emplace(Args&&... args)
-   {
-      const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
+    template <typename... Args> void Emplace(Args&&... args)
+    {
+        const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
 
-      m_queue.emplace(std::forward<Args>(args)...);
+        m_queue.emplace(std::forward<Args>(args)...);
 
-      m_conditionVariable.notify_one();
-   }
+        m_conditionVariable.notify_one();
+    }
 
-   void WaitAndPop(Type& data)
-   {
-      std::unique_lock<decltype(m_mutex)> lock{ m_mutex };
-      m_conditionVariable.wait(lock, [this] { return !m_queue.empty(); });
+    void WaitAndPop(Type& data)
+    {
+        std::unique_lock<decltype(m_mutex)> lock{ m_mutex };
+        m_conditionVariable.wait(lock, [this] { return !m_queue.empty(); });
 
-      data = std::move(m_queue.front());
+        data = std::move(m_queue.front());
 
-      m_queue.pop();
-   }
+        m_queue.pop();
+    }
 
-   std::shared_ptr<Type> WaitAndPop()
-   {
-      std::unique_lock<decltype(m_mutex)> lock{ m_mutex };
-      m_conditionVariable.wait(lock, [this] { return !m_queue.empty(); });
+    std::shared_ptr<Type> WaitAndPop()
+    {
+        std::unique_lock<decltype(m_mutex)> lock{ m_mutex };
+        m_conditionVariable.wait(lock, [this] { return !m_queue.empty(); });
 
-      const auto result = std::make_shared<Type>(std::move(m_queue.front()));
-      m_queue.pop();
+        const auto result = std::make_shared<Type>(std::move(m_queue.front()));
+        m_queue.pop();
 
-      return result;
-   }
+        return result;
+    }
 
-   bool TryPop(Type& data)
-   {
-      const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
+    bool TryPop(Type& data)
+    {
+        const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
 
-      if (m_queue.empty())
-      {
-         return false;
-      }
+        if (m_queue.empty()) {
+            return false;
+        }
 
-      data = std::move(m_queue.front());
-      m_queue.pop();
+        data = std::move(m_queue.front());
+        m_queue.pop();
 
-      return true;
-   }
+        return true;
+    }
 
-   std::shared_ptr<Type> TryPop()
-   {
-      const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
+    std::shared_ptr<Type> TryPop()
+    {
+        const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
 
-      if (m_queue.empty())
-      {
-         return {};
-      }
+        if (m_queue.empty()) {
+            return {};
+        }
 
-      const auto result = std::make_shared<Type>(std::move(m_queue.front()));
-      m_queue.pop();
+        const auto result = std::make_shared<Type>(std::move(m_queue.front()));
+        m_queue.pop();
 
-      return result;
-   }
+        return result;
+    }
 
-   bool IsEmpty() const
-   {
-      const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
-      return m_queue.empty();
-   }
+    bool IsEmpty() const
+    {
+        const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
+        return m_queue.empty();
+    }
 
- private:
-   mutable std::mutex m_mutex;
+  private:
+    mutable std::mutex m_mutex;
 
-   std::queue<Type> m_queue;
-   std::condition_variable m_conditionVariable;
+    std::queue<Type> m_queue;
+    std::condition_variable m_conditionVariable;
 };
