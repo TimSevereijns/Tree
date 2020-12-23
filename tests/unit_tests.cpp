@@ -1,9 +1,7 @@
-#pragma once
-
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
-#include "Catch.hpp"
+#include <catch2/catch.hpp>
 
-#include "../Tree/Tree.hpp"
+#include "tree.h"
 
 #include <algorithm>
 #include <vector>
@@ -87,16 +85,16 @@ namespace
     *
     * @param[in] expected                  The expected sequence.
     * @param[in] actual                    The actual sequence.
-    * @param[in] performSubsetComparision  Forces the consumer to explicitly acknowledge that he
+    * @param[in] performSubsetComparison   Forces the consumer to explicitly acknowledge that he
     *                                      or she wants to allow subset comparison.
     */
    template <typename DataType>
    void VerifyTraversal(
        const std::vector<DataType>& expected,
        const std::vector<DataType>& actual,
-       bool performSubsetComparision = false)
+       bool performSubsetComparison = false)
    {
-      if (performSubsetComparision)
+      if (performSubsetComparison)
       {
          SubsetEquals(expected, actual);
          return;
@@ -120,8 +118,8 @@ namespace
    void VerifyParentIsIdentical(const Tree<DataType>& tree)
    {
       const bool allNodesHaveIdenticalParent = std::all_of(
-          Tree<DataType>::LeafIterator{ tree.GetRoot() },
-          Tree<DataType>::LeafIterator{},
+          typename Tree<DataType>::LeafIterator{ tree.GetRoot() },
+          typename Tree<DataType>::LeafIterator{},
           [root = tree.GetRoot()](const auto& node) noexcept { return node.GetParent() == root; });
 
       REQUIRE(allNodesHaveIdenticalParent == true);
@@ -208,7 +206,15 @@ TEST_CASE("Node Alterations")
    SECTION("Altering Data")
    {
       auto& data = node.GetData();
+
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable : 4244) // toupper(...) takes an int instead of a char.
+#endif
       std::transform(std::begin(data), std::end(data), std::begin(data), ::toupper);
+#ifdef WIN32
+#pragma warning(pop)
+#endif // Win32
 
       REQUIRE(node.GetData() == "BAR");
    }
@@ -218,8 +224,7 @@ TEST_CASE("Prepending and Appending Nodes")
 {
    Tree<int> tree{ 10 };
 
-   const auto IsEachNodeValueLargerThanTheLast = [&]() noexcept
-   {
+   const auto IsEachNodeValueLargerThanTheLast = [&]() noexcept {
       int lastValue = -1;
 
       return std::all_of(std::begin(tree), std::end(tree), [&](Tree<int>::const_reference node) {
@@ -617,9 +622,8 @@ TEST_CASE("Sorting")
           tree.GetRoot()->GetFirstChild()->GetNextSibling()->GetPreviousSibling() ==
           tree.GetRoot()->GetFirstChild());
 
-      tree.GetRoot()->SortChildren([](const auto& lhs, const auto& rhs) noexcept {
-         return (lhs < rhs);
-      });
+      tree.GetRoot()->SortChildren(
+          [](const auto& lhs, const auto& rhs) noexcept { return (lhs < rhs); });
 
       REQUIRE(
           tree.GetRoot()->GetFirstChild()->GetNextSibling()->GetPreviousSibling() ==
@@ -656,9 +660,8 @@ TEST_CASE("Sorting")
       tree.GetRoot()->AppendChild("L");
       tree.GetRoot()->AppendChild("K");
 
-      tree.GetRoot()->SortChildren([](const auto& lhs, const auto& rhs) noexcept {
-         return (lhs < rhs);
-      });
+      tree.GetRoot()->SortChildren(
+          [](const auto& lhs, const auto& rhs) noexcept { return (lhs < rhs); });
 
       REQUIRE(tree.GetRoot()->GetFirstChild()->GetPreviousSibling() == nullptr);
       REQUIRE(tree.GetRoot()->GetLastChild()->GetNextSibling() == nullptr);

@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 
-#include "Tree.hpp"
+#include "tree.h"
 
 namespace
 {
@@ -25,7 +25,7 @@ namespace
       stream << converter.to_bytes(wideString);
       return stream;
    }
-}
+} // namespace
 
 namespace TreeUtilities
 {
@@ -78,4 +78,4 @@ namespace TreeUtilities
 
       outputFile << graphStream.rdbuf();
    }
-}
+} // namespace TreeUtilities

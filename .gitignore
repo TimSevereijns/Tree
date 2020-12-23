@@ -32,8 +32,11 @@
 # Visual Studio settings and build product folders
 Debug
 Release
+build
 .vs
+.vscode
 *.db
 *.psess
-
 *.vspx
+
+conan

@@ -1,4 +1,6 @@
-#include "ScopedHandle.h"
+#include "scoped_handle.h"
+
+#ifdef WIN32
 
 #include <Windows.h>
 
@@ -14,20 +16,19 @@ namespace
       HANDLE duplicate;
 
       const auto successfullyDuplicated = !DuplicateHandle(
-         /* sourceProcessHandle = */ GetCurrentProcess(),
-         /* sourceHandle = */ handle,
-         /* targetProcessHandle = */ GetCurrentProcess(),
-         /* targetHandle = */ &duplicate,
-         /* desiredAccess = */ 0,
-         /* inheritHandle = */ FALSE,
-         /* options = */ DUPLICATE_SAME_ACCESS);
+          /* sourceProcessHandle = */ GetCurrentProcess(),
+          /* sourceHandle = */ handle,
+          /* targetProcessHandle = */ GetCurrentProcess(),
+          /* targetHandle = */ &duplicate,
+          /* desiredAccess = */ 0,
+          /* inheritHandle = */ FALSE,
+          /* options = */ DUPLICATE_SAME_ACCESS);
 
       return successfullyDuplicated ? duplicate : nullptr;
    }
-}
+} // namespace
 
-ScopedHandle::ScopedHandle(HANDLE handle) :
-   m_handle{ handle }
+ScopedHandle::ScopedHandle(HANDLE handle) : m_handle{ handle }
 {
 }
 
@@ -93,3 +94,5 @@ ScopedHandle::operator HANDLE() const
 {
    return m_handle;
 }
+
+#endif // Win32
