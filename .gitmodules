@@ -3,4 +3,4 @@
 	url = https://github.com/catchorg/Catch2.git
 [submodule "third-party/stopwatch"]
 	path = third-party/stopwatch
-	url = git@github.com:TimSevereijns/Stopwatch.git
+	url = https://github.com/TimSevereijns/Stopwatch.git
