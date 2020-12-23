@@ -200,7 +200,7 @@ template <typename DataType> class Tree
 };
 
 /**
- * The Node class represents the nodes that make up the Tree.
+ * Represents the nodes that make up the Tree.
  *
  * Each node has a pointer to its parent, its first and last child, its previous and next
  * sibling, and, of course, to the data it encapsulates.
@@ -217,7 +217,7 @@ template <typename DataType> class Tree<DataType>::Node
      * @brief Node default constructs a new Node. All outgoing links from this new node will
      * initialized to a nullptr.
      */
-    constexpr Node() noexcept = default;
+    Node() noexcept = default;
 
     /**
      * @brief Node constructs a new Node encapsulating the specified data. All outgoing links
@@ -391,7 +391,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns True if the node has been marked as visited.
      */
-    inline constexpr bool HasBeenVisited() const noexcept
+    inline bool HasBeenVisited() const noexcept
     {
         return m_visited;
     }
@@ -423,7 +423,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief PrependChild will construct and prepend a new Node as the first child of the
+     * @brief Constructs and prepends a new Node as the first child of the
      * Node.
      *
      * @param[in] data                The underlying data to be stored in the new Node.
@@ -446,7 +446,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief AppendChild will append the specified Node as a child of the Node.
+     * @brief Appends the specified Node as a child of the Node.
      *
      * @param[in] child               The new Node to set as the last child of the Node.
      *
@@ -472,7 +472,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief AppendChild will construct and append a new Node as the last child of the Node.
+     * @brief Constructs and appends a new Node as the last child of the Node.
      *
      * @param[in] data                The underlying data to be stored in the new Node.
      *
@@ -512,7 +512,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns A pointer to the Node's parent, if it exists; nullptr otherwise.
      */
-    inline constexpr Node* GetParent() const
+    inline Node* GetParent() const
     {
         return m_parent;
     }
@@ -520,7 +520,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns A pointer to the Node's first child.
      */
-    inline constexpr Node* GetFirstChild() const
+    inline Node* GetFirstChild() const
     {
         return m_firstChild;
     }
@@ -528,7 +528,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns A pointer to the Node's last child.
      */
-    inline constexpr Node* GetLastChild() const
+    inline Node* GetLastChild() const
     {
         return m_lastChild;
     }
@@ -536,7 +536,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns A pointer to the Node's next sibling.
      */
-    inline constexpr Node* GetNextSibling() const
+    inline Node* GetNextSibling() const
     {
         return m_nextSibling;
     }
@@ -544,7 +544,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns A pointer to the Node's previous sibling.
      */
-    inline constexpr Node* GetPreviousSibling() const
+    inline Node* GetPreviousSibling() const
     {
         return m_previousSibling;
     }
@@ -552,7 +552,7 @@ template <typename DataType> class Tree<DataType>::Node
     /**
      * @returns True if this node has direct descendants.
      */
-    inline constexpr bool HasChildren() const noexcept
+    inline bool HasChildren() const noexcept
     {
         return m_childCount > 0;
     }
@@ -562,7 +562,7 @@ template <typename DataType> class Tree<DataType>::Node
      *
      * @note This does not include grandchildren.
      */
-    inline constexpr unsigned int GetChildCount() const noexcept
+    inline unsigned int GetChildCount() const noexcept
     {
         return m_childCount;
     }
@@ -580,7 +580,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief SortChildren performs a merge sort of the direct descendants nodes.
+     * @brief Performs a merge sort of the direct descendants nodes.
      *
      * @param[in] comparator          A callable type to be used as the basis for the sorting
      *                                comparison. This type should be equivalent to:
@@ -595,7 +595,6 @@ template <typename DataType> class Tree<DataType>::Node
 
         Node* head = MergeSort(m_firstChild, comparator);
 
-        // @todo Set first and last child in constant time.
         if (head->m_parent) {
             head->m_parent->m_firstChild = head;
 
@@ -631,7 +630,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief MergeSort is the main entry point into the merge sort implementation.
+     * @brief Main entry point into the merge sort implementation.
      *
      * @todo A recursive solution may run out of stack space!
      *
@@ -655,7 +654,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief MergeSortedHalves is a helper function that will merge the sorted halves.
+     * @brief Helper function that will merge the sorted halves.
      *
      * @param[in] lhs                 The first node of the sorted left half.
      * @param[in] rhs                 The first node of the sorted right half.
@@ -704,7 +703,7 @@ template <typename DataType> class Tree<DataType>::Node
     }
 
     /**
-     * @brief AddFirstChild is a helper function to make it easier to add the first descendant.
+     * @brief Helper function to make it easier to add the first descendant.
      *
      * @param[in] child               The Node to be added as a child.
      *
@@ -803,7 +802,7 @@ template <typename DataType> class Tree<DataType>::Node
 };
 
 /**
- * @brief The Iterator class
+ * @brief The base iterator.
  *
  * This is the base iterator class that all other iterators (sibling, leaf, post-, pre-, and
  * in-order) will derive from. This class can only instantiated by derived types.
@@ -861,7 +860,7 @@ template <typename DataType> class Tree<DataType>::Iterator
     }
 
     /**
-     * @returns A pointer to the Node pointed to by the Tree:Iterator.
+     * @returns A pointer to the Node pointed to by the Tree::Iterator.
      */
     inline Node* operator->() noexcept
     {
@@ -877,7 +876,7 @@ template <typename DataType> class Tree<DataType>::Iterator
     }
 
     /**
-     * @returns True if the Iterator points to the same node as the other Iterator,
+     * @returns True if the iterator points to the same node as the other iterator,
      * and false otherwise.
      */
     inline bool operator==(const Iterator& other) const
@@ -886,7 +885,7 @@ template <typename DataType> class Tree<DataType>::Iterator
     }
 
     /**
-     * @returns True if the Iterator points to the same node as the other Iterator,
+     * @returns True if the iterator points to the same node as the other iterator,
      * and false otherwise.
      */
     bool operator!=(const Iterator& other) const noexcept
@@ -906,7 +905,7 @@ template <typename DataType> class Tree<DataType>::Iterator
     explicit Iterator(const Iterator& other) = default;
 
     /**
-     * Constructs a Iterator started at the specified node.
+     * Constructs a iterator starting at the specified node.
      */
     explicit Iterator(const Node* node) noexcept
         : m_currentNode{ const_cast<Node*>(node) }, m_startingNode{ const_cast<Node*>(node) }
@@ -920,7 +919,7 @@ template <typename DataType> class Tree<DataType>::Iterator
 };
 
 /**
- * @brief The PreOrderIterator class
+ * @brief A pre-order tree iterator.
  */
 template <typename DataType>
 class Tree<DataType>::PreOrderIterator final : public Tree<DataType>::Iterator
@@ -958,7 +957,7 @@ class Tree<DataType>::PreOrderIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Prefix increment operator.
+     * Pre-fix increment operator.
      */
     typename Tree::PreOrderIterator& operator++() noexcept
     {
@@ -986,7 +985,7 @@ class Tree<DataType>::PreOrderIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Postfix increment operator.
+     * Post-fix increment operator.
      */
     typename Tree::PreOrderIterator operator++(int) noexcept
     {
@@ -998,7 +997,7 @@ class Tree<DataType>::PreOrderIterator final : public Tree<DataType>::Iterator
 };
 
 /**
- * @brief The PostOrderIterator class
+ * @brief A post-order tree iterator.
  */
 template <typename DataType>
 class Tree<DataType>::PostOrderIterator final : public Tree<DataType>::Iterator
@@ -1043,7 +1042,7 @@ class Tree<DataType>::PostOrderIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Prefix increment operator.
+     * Pre-fix increment operator.
      */
     typename Tree::PostOrderIterator& operator++() noexcept
     {
@@ -1072,7 +1071,7 @@ class Tree<DataType>::PostOrderIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Postfix increment operator.
+     * Post-fix increment operator.
      */
     typename Tree::PostOrderIterator operator++(int) noexcept
     {
@@ -1087,7 +1086,7 @@ class Tree<DataType>::PostOrderIterator final : public Tree<DataType>::Iterator
 };
 
 /**
- * @brief The LeafIterator class
+ * @brief A leaf-order tree iterator.
  */
 template <typename DataType>
 class Tree<DataType>::LeafIterator final : public Tree<DataType>::Iterator
@@ -1146,7 +1145,7 @@ class Tree<DataType>::LeafIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Prefix increment operator.
+     * Pre-fix increment operator.
      */
     typename Tree::LeafIterator& operator++() noexcept
     {
@@ -1184,7 +1183,7 @@ class Tree<DataType>::LeafIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Postfix increment operator.
+     * Post-fix increment operator.
      */
     typename Tree::LeafIterator operator++(int) noexcept
     {
@@ -1196,7 +1195,7 @@ class Tree<DataType>::LeafIterator final : public Tree<DataType>::Iterator
 };
 
 /**
- * @brief The SiblingIterator class
+ * @brief A sibling node iterator.
  */
 template <typename DataType>
 class Tree<DataType>::SiblingIterator final : public Tree<DataType>::Iterator
@@ -1215,7 +1214,7 @@ class Tree<DataType>::SiblingIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Prefix increment operator.
+     * Pre-fix increment operator.
      */
     typename Tree::SiblingIterator& operator++() noexcept
     {
@@ -1227,7 +1226,7 @@ class Tree<DataType>::SiblingIterator final : public Tree<DataType>::Iterator
     }
 
     /**
-     * Postfix increment operator.
+     * Post-fix increment operator.
      */
     typename Tree::SiblingIterator operator++(int) noexcept
     {
