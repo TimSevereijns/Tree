@@ -41,7 +41,6 @@ set(BENCHMARK
     benchmark/file_info.h
     benchmark/scoped_handle.cpp
     benchmark/scoped_handle.h
-    benchmark/thread_safe_queue.h
     benchmark/win_hack.h)
 
 include_directories(${SOURCE_DIR} ${THIRD_PARTY})
