@@ -71,7 +71,7 @@ std::uintmax_t ComputeFileSize(const std::filesystem::path& path) noexcept
     } catch (...) {
 #ifdef WIN32
         return GetFileSizeUsingWinAPI(path);
-#elif // Win32
+#else // Win32
         return 0ull;
 #endif
     }
