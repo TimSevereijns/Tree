@@ -43,7 +43,7 @@ std::uintmax_t GetFileSizeUsingWinAPI(const std::filesystem::path& path)
     std::uintmax_t fileSize{ 0 };
 
     WIN32_FIND_DATAW fileData;
-    const HANDLE fileHandle = FindFirstFileW(path.wstring().data(), &fileData);
+    const HANDLE fileHandle = FindFirstFileW(path.string().data(), &fileData);
     if (fileHandle == INVALID_HANDLE_VALUE) {
         return 0;
     }
@@ -109,8 +109,8 @@ std::shared_ptr<Tree<FileInfo>> CreateTreeAndRootNode(const std::filesystem::pat
         return nullptr;
     }
 
-    static const std::wstring blankExtension = L"";
-    FileInfo fileInfo{ path.wstring(), blankExtension, DriveScanner::UndefinedSize,
+    static const std::string blankExtension = "";
+    FileInfo fileInfo{ path.string(), blankExtension, DriveScanner::UndefinedSize,
                        FileType::Directory };
 
     return std::make_shared<Tree<FileInfo>>(Tree<FileInfo>(std::move(fileInfo)));
@@ -120,7 +120,7 @@ std::shared_ptr<Tree<FileInfo>> CreateTreeAndRootNode(const std::filesystem::pat
 ScopedHandle OpenReparsePoint(const std::filesystem::path& path) noexcept
 {
     const auto handle = CreateFileW(
-        /* lpFileName = */ path.wstring().c_str(),
+        /* lpFileName = */ path.string().c_str(),
         /* dwDesiredAccess = */ GENERIC_READ,
         /* dwShareMode = */ 0,
         /* lpSecurityAttributes = */ nullptr,
@@ -131,7 +131,7 @@ ScopedHandle OpenReparsePoint(const std::filesystem::path& path) noexcept
     return ScopedHandle{ handle };
 }
 
-bool ReadReparsePoint(const std::wstring& path, std::vector<std::byte>& reparseBuffer) noexcept
+bool ReadReparsePoint(const std::string& path, std::vector<std::byte>& reparseBuffer) noexcept
 {
     const auto handle = OpenReparsePoint(path);
     if (!handle.IsValid()) {
@@ -210,7 +210,7 @@ void DriveScanner::ProcessFile(
 
     m_progress.bytesProcessed.fetch_add(fileSize);
 
-    FileInfo fileInfo{ path.filename().stem().wstring(), path.filename().extension().wstring(),
+    FileInfo fileInfo{ path.filename().stem().string(), path.filename().extension().string(),
                        fileSize, FileType::Regular };
 
     const std::lock_guard<decltype(m_mutex)> lock{ m_mutex };
@@ -245,8 +245,8 @@ void DriveScanner::ProcessPath(
             return;
         }
 
-        static const std::wstring blankExtension = L"";
-        FileInfo directoryInfo{ path.filename().wstring(), blankExtension,
+        static const std::string blankExtension = "";
+        FileInfo directoryInfo{ path.filename().string(), blankExtension,
                                 DriveScanner::UndefinedSize, FileType::Directory };
 
         std::unique_lock<decltype(m_mutex)> lock{ m_mutex };

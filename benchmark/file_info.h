@@ -19,8 +19,8 @@ enum class FileType
  */
 struct FileInfo
 {
-    std::wstring name;
-    std::wstring extension;
+    std::string name;
+    std::string extension;
 
     std::uintmax_t size;
 

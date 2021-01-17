@@ -50,7 +50,7 @@ class DriveScanner
     /**
      * @returns A constant reference to the progress tracker.
      */
-    const ScanningProgress& DriveScanner::GetProgress() const;
+    const ScanningProgress& GetProgress() const;
 
   private:
     /**

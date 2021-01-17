@@ -3,6 +3,7 @@
 #include <iostream>
 #include <numeric>
 #include <string>
+#include <thread>
 
 #include "tree.h"
 
@@ -25,7 +26,7 @@ template <typename ChronoType, typename LambdaType> auto RunTrials(LambdaType&& 
     std::vector<ChronoType> elapsedTimes;
     elapsedTimes.reserve(trialCount);
 
-    for (int i = 0; i < elapsedTimes.capacity(); ++i) {
+    for (int i = 0; i < static_cast<int>(elapsedTimes.capacity()); ++i) {
         const auto clock = Stopwatch<ChronoType>([&] { trial(); });
         elapsedTimes.emplace_back(clock.GetElapsedTime());
     }
@@ -101,7 +102,13 @@ int main()
     std::cout.imbue(std::locale{ "" });
     std::cout << "Scanning drive to create a large tree...\n";
 
-    DriveScanner scanner{ std::filesystem::path{ "C:\\" } };
+#ifdef WIN32
+    const std::string root = "C:\\";
+#else
+    const std::string root = "/home/tim";
+#endif // Win32
+
+    DriveScanner scanner{ std::filesystem::path{ root } };
     auto scanningThread = std::thread{ [&] { scanner.Start(); } };
     WaitAndReportProgress(scanner);
     scanningThread.join();
