@@ -105,7 +105,7 @@ int main()
 #ifdef WIN32
     const std::string root = "C:\\";
 #else
-    const std::string root = "/home/tim";
+    const std::string root = "/home/";
 #endif // Win32
 
     DriveScanner scanner{ std::filesystem::path{ root } };
